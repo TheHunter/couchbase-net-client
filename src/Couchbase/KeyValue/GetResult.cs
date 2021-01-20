@@ -18,7 +18,7 @@ namespace Couchbase.KeyValue
     {
         private readonly IMemoryOwner<byte> _contentBytes;
         private readonly IList<LookupInSpec> _specs;
-        private readonly List<string>? _projectList;
+        private readonly IReadOnlyCollection<string>? _projectList;
         private readonly ITypeTranscoder _transcoder;
         private readonly ITypeSerializer _serializer;
         private readonly ILogger<GetResult> _logger;
@@ -27,7 +27,7 @@ namespace Couchbase.KeyValue
         private DateTime? _expiryTime;
 
         internal GetResult(IMemoryOwner<byte> contentBytes, ITypeTranscoder transcoder, ILogger<GetResult> logger,
-            List<LookupInSpec>? specs = null, List<string>? projectList = null)
+            List<LookupInSpec>? specs = null, IReadOnlyCollection<string>? projectList = null)
         {
             if (transcoder == null)
             {
@@ -185,8 +185,8 @@ namespace Couchbase.KeyValue
 
         private void ParseSpecs()
         {
-            //we already parsed the response from the server but not each element
-            if(_isParsed) return;
+            //we already parsed the response from the server but not each element or nothing to parse
+            if(_isParsed || _specs.Count == 0) return;
 
             var response = _contentBytes.Memory;
             var commandIndex = 0;
